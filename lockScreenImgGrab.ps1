@@ -1,7 +1,6 @@
 Add-Type -Assembly System.Drawing
 
 $src = "C:\Users\$env:UserName\AppData\Local\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets"
-# $dst = "C:\Users\$env:UserName\Desktop\assets"
 $dst = "C:\Users\$env:UserName\Pictures\wallpapers"
 
 if(!(Test-Path -Path $dst )) {
@@ -15,15 +14,11 @@ Get-ChildItem $dst | Rename-item -newname { [io.path]::ChangeExtension($_.name, 
 Get-ChildItem $dst | Foreach-Object {
     $png = New-Object System.Drawing.Bitmap $_.FullName
 
-    if !($png.Width.Equals(1920) -and $png.Height.Equals(1080)) {
+    if (!($png.Width.Equals(1920) -and $png.Height.Equals(1080))) {
         $png.Dispose()
         Remove-Item $_.FullName -Force
     }
     else {
         $png.Dispose()
     }
-
 }
-
-Get-ChildItem -Path $dst | Remove-Item -force
-Remove-Item $dst -Force
