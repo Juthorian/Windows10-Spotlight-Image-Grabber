@@ -4,33 +4,32 @@ $src = "C:\Users\$env:UserName\AppData\Local\Packages\Microsoft.Windows.ContentD
 $dst = "C:\Users\$env:UserName\Pictures\wallpapers"
 
 if(!(Test-Path -Path $dst )) {
-  New-Item -ItemType directory -Path $dst
+    New-Item -ItemType directory -Path $dst
 }
 
-Get-ChildItem $src | Copy-Item -Destination $dst -Force
+Get-ChildItem $src | Foreach-Object {
+    $name = $_.FullName
+    $nameOnly = $_.Name
+    $dirName = $_.Directory.FullName
 
-Get-ChildItem $dst | Foreach-Object {
-  $newName = [io.path]::ChangeExtension($_.name, "png")
-  $dest = Join-Path -Path $_.Directory.FullName -ChildPath $newName
-  Move-Item -Path $_.FullName -Destination $dest -Force
-}
+    try {
+        $png = New-Object System.Drawing.Bitmap $name
+        if (!($png.Width.Equals(1920) -and $png.Height.Equals(1080))) {
+            $png.Dispose()
+        }
+        else {
+            $png.Dispose()
+            $checkPath = $dst + "\" + $nameOnly + ".png"
+            if (!(Test-Path $checkPath)) {
+                Write-Host "New Image: $nameOnly"
 
-Get-ChildItem $dst | Foreach-Object {
-  $name = $_.FullName
-  try
-  {
-    $png = New-Object System.Drawing.Bitmap $name
-    if (!($png.Width.Equals(1920) -and $png.Height.Equals(1080))) {
-        $png.Dispose()
-        Remove-Item $name -Force
+                $newName = [io.path]::ChangeExtension($nameOnly, "png")
+                $dest = Join-Path -Path $dst -ChildPath $newName
+                Copy-Item $name -Destination $dest
+           }
+        }
     }
-    else {
+    catch {
         $png.Dispose()
     }
-  }
-  catch
-  {
-    $png.Dispose()
-    Remove-Item $name -Force
-  }
 }
