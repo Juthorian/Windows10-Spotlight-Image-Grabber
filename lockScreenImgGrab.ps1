@@ -26,6 +26,8 @@ Get-ChildItem $src | Foreach-Object {
                 $newName = [io.path]::ChangeExtension($nameOnly, "png")
                 $dest = Join-Path -Path $dst -ChildPath $newName
                 Copy-Item $name -Destination $dest
+                $processName = $dst+"\"+$newName
+                Start-Process $processName
            }
         }
     }
